@@ -995,17 +995,17 @@ export default {
   }
   
   .fishing-scene {
-    height: 400px;
+    height: 350px;
   }
   
   .fisherman {
-    left: 10px;
-    top: 15px;
+    left: 5px;
+    top: 50px;
   }
   
   .fishing-rod-container {
-    left: 70%;
-    top: 25px;
+    left: 75%;
+    top: 50px;
   }
   
   .person {
@@ -1017,18 +1017,28 @@ export default {
   }
   
   .fisherman-img {
-    width: 160px;
-    height: 160px;
+    width: 120px;
+    height: 120px;
   }
   
   .rod-image {
-    width: 140px;
+    width: 100px;
   }
   
   .game-hud {
-    position: static;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    left: auto;
+    bottom: auto;
+    width: 100px !important;
+    min-width: 100px !important;
+    background: rgba(0, 0, 0, 0.9);
+    font-size: 0.6rem;
+    padding: 6px;
+    z-index: 5;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   .bet-section {
@@ -1038,6 +1048,80 @@ export default {
   .catch-btn {
     min-width: 250px;
     font-size: 1rem;
+  }
+  
+  .tension-meter {
+    margin-bottom: 3px;
+  }
+  
+  .meter-bar {
+    height: 8px;
+  }
+  
+  .meter-label {
+    font-size: 0.5rem;
+    margin-bottom: 1px;
+  }
+  
+  .meter-value {
+    font-size: 0.5rem;
+    margin-top: 1px;
+  }
+  
+  .multiplier {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #e11d48;
+  }
+  
+  .potential-win {
+    font-size: 0.65rem;
+    color: #4ade80;
+    font-weight: bold;
+  }
+  
+  .fishing-status {
+    font-size: 0.5rem;
+  }
+  
+  .multiplier-display {
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  
+  /* Mobile HUD styling */
+  .game-hud {
+    background: rgba(0, 0, 0, 0.95) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .game-hud .meter-label,
+  .game-hud .meter-value,
+  .game-hud .fishing-status {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .game-hud .multiplier {
+    color: #ff6b6b !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .game-hud .potential-win {
+    color: #51cf66 !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* 手機版調整山脈和水面位置，讓土地更高 */
+  .mountains {
+    top: 60px;
+    height: 100px;
+  }
+  
+  .water-surface {
+    top: 160px;
+    height: 190px;
   }
 }
 </style>
