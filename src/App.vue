@@ -137,6 +137,11 @@
           </button>
         </div>
       </div>
+      
+      <!-- 版權聲明 -->
+      <div class="copyright">
+        © 2025 Evans. All rights reserved.
+      </div>
     </div>
   </div>
 </template>
@@ -876,6 +881,18 @@ export default {
 
 .result-modal.info {
   border-top: 5px solid #e11d48;
+}
+
+/* 版權聲明 */
+.copyright {
+  text-align: center;
+  margin-top: 30px;
+  padding: 15px;
+  color: #6b7280;
+  font-size: 0.9rem;
+  border-top: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 0 0 15px 15px;
 }
 
 /* 響應式設計 */
