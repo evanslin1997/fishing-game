@@ -3,7 +3,7 @@
     <div class="game-header">
       <h1>🎣 Sporty Fishing</h1>
       <div class="balance">
-        Balance: ${{ balance }}
+        Balance: ${{ Math.floor(balance) }}
       </div>
     </div>
     
@@ -15,21 +15,27 @@
         <div class="mountains"></div>
         
         <!-- 釣魚人 -->
-        <div class="fisherman">
+        <div class="fisherman" 
+             :class="{ shaking: isFishing && escapeChance > 10 }"
+             :style="{ '--shake-intensity': shakeIntensity }">
           <div class="person">
             <img src="/fisherman.png" alt="釣魚人" class="fisherman-img">
           </div>
+        </div>
+        
+        <!-- 釣魚竿 (獨立位置在中上方) -->
+        <div class="fishing-rod-container">
           <div class="fishing-rod" 
                :class="{ 
                  casting: isFishing,
                  shaking: isFishing && escapeChance > 10
                }"
                :style="{ '--shake-intensity': shakeIntensity }">
-            <!-- 選擇1: CSS釣魚竿 (目前) -->
-            <div class="rod-line"></div>
+            <!-- 選擇1: CSS釣魚竿 (隱藏) -->
+            <!-- <div class="rod-line"></div> -->
             
-            <!-- 選擇2: 圖片釣魚竿 (取消注釋來使用) -->
-            <!-- <img src="@/assets/fishing-rod.png" alt="釣魚竿" class="rod-image"> -->
+            <!-- 選擇2: 圖片釣魚竿 (使用中) -->
+            <img src="/fishing-rod.png" alt="釣魚竿" class="rod-image">
           </div>
         </div>
         
@@ -52,7 +58,7 @@
             
             <!-- 魚咬鉤效果 -->
             <div class="fish-bite" v-if="fishHooked" :class="{ struggling: fishStruggling }">
-              🐟
+              <img src="/fish.png" alt="魚" class="fish-image">
             </div>
           </div>
         </div>
@@ -60,7 +66,15 @@
         <!-- 水底 -->
         <div class="underwater">
           <div class="fish-swimming" v-if="!fishHooked && isFishing">
-            <div class="fish" v-for="i in 3" :key="i" :style="{ animationDelay: (i * 0.5) + 's' }">🐠</div>
+            <div class="fish" v-for="(position, index) in fishPositions" :key="index" 
+                 :style="{ 
+                   animationDelay: (index * 0.8) + 's',
+                   '--start-position': position + '%',
+                   left: position + '%'
+                 }"
+                 :class="'fish-' + index">
+              <img src="/fish.png" alt="魚" class="swimming-fish-image">
+            </div>
           </div>
         </div>
         
@@ -166,10 +180,16 @@ export default {
       hookTimeout: null,
       shakeIntensity: 0,
       lineShakeAmount: 0,
-      fishingLineLength: 120
+      fishingLineLength: 120,
+      fishPositions: []
     }
   },
   methods: {
+    getRandomStartPosition() {
+      // 返回-20到120之間的隨機位置，讓魚從不同地方出現
+      return Math.random() * 140 - 20;
+    },
+    
     startFishing() {
       if (this.betAmount > this.balance) return;
       
@@ -185,6 +205,12 @@ export default {
       this.gameResult = null;
       this.shakeIntensity = 0;
       this.lineShakeAmount = 0;
+      
+      // 每次開始釣魚時生成新的隨機魚位置
+      this.fishPositions = [];
+      for (let i = 0; i < 6; i++) {
+        this.fishPositions.push(Math.random() * 140 - 20);
+      }
       
       // 隨機決定魚咬鉤時間 (3-8秒)
       const hookTime = 3000 + Math.random() * 5000;
@@ -395,9 +421,19 @@ export default {
 /* 釣魚人 */
 .fisherman {
   position: absolute;
-  top: 50px;
-  left: 50px;
+  top: 20px;
+  left: 20px;
   z-index: 10;
+}
+
+.fisherman.shaking {
+  animation: fisherman-shake 0.3s ease-in-out infinite;
+}
+
+@keyframes fisherman-shake {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(calc(var(--shake-intensity, 0) * 0.5px)) translateY(calc(var(--shake-intensity, 0) * -0.3px)); }
+  75% { transform: translateX(calc(var(--shake-intensity, 0) * -0.5px)) translateY(calc(var(--shake-intensity, 0) * 0.3px)); }
 }
 
 .person {
@@ -407,24 +443,34 @@ export default {
 
 /* 自定義釣魚人圖片 */
 .fisherman-img {
-  width: 150px;           /* 調整寬度 */
-  height: 150px;          /* 調整高度 */
+  width: 200px;           /* 調整寬度 - 放大 */
+  height: 200px;          /* 調整高度 - 放大 */
   object-fit: contain;    /* 保持比例 */
-  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.3));
+  transform: scaleX(-1);  /* 水平鏡像翻轉 */
 }
 
-/* 自定義釣魚竿圖片 - 取消注释來使用 */
-/*
+/* 釣魚竿容器 - 獨立定位在右中上方 */
+.fishing-rod-container {
+  position: absolute;
+  top: 40px;
+  left: 65%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* 自定義釣魚竿圖片 */
 .rod-image {
-  width: 150px;
+  width: 180px;
   height: auto;
   object-fit: contain;
   transform-origin: 10px center;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+  transform: scaleX(-1) rotate(0deg);  /* 水平鏡像翻轉，初始不旋轉 */
 }
 
 .fishing-rod.casting .rod-image {
-  transform: rotate(25deg);
+  transform: scaleX(-1) rotate(25deg);
 }
 
 .fishing-rod.shaking .rod-image {
@@ -432,20 +478,19 @@ export default {
 }
 
 @keyframes rod-shake-image {
-  0%, 100% { transform: rotate(25deg); }
-  25% { transform: rotate(calc(25deg + var(--shake-intensity, 0) * 1deg)); }
-  75% { transform: rotate(calc(25deg - var(--shake-intensity, 0) * 1deg)); }
+  0%, 100% { transform: scaleX(-1) rotate(25deg); }
+  25% { transform: scaleX(-1) rotate(calc(25deg + var(--shake-intensity, 0) * 1deg)); }
+  75% { transform: scaleX(-1) rotate(calc(25deg - var(--shake-intensity, 0) * 1deg)); }
 }
-*/
 
 .fishing-rod {
   position: relative;
   width: 150px;
   height: 4px;
-  background: #8b4513;
+  background: transparent; /* 隱藏CSS釣魚竿背景 */
   border-radius: 2px;
   transform-origin: 10px center;
-  transform: rotate(35deg);
+  transform: rotate(0deg); /* 初始狀態不旋轉 */
   transition: transform 0.5s ease;
 }
 
@@ -457,14 +502,9 @@ export default {
   animation: rod-shake 0.3s ease-in-out infinite;
 }
 
+/* CSS釣魚竿線 - 已隱藏，使用圖片釣魚竿 */
 .rod-line {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 2px;
-  height: 200px;
-  background: #333;
-  transform-origin: top;
+  display: none;
 }
 
 @keyframes rod-shake {
@@ -548,8 +588,8 @@ export default {
 /* 魚咬鉤效果 */
 .fish-bite {
   position: absolute;
-  bottom: -25px;
-  left: -15px;
+  bottom: -60px;
+  left: -60px;
   font-size: 2rem;
   z-index: 5;
 }
@@ -558,10 +598,34 @@ export default {
   animation: fish-struggle 0.3s ease-in-out;
 }
 
+.fish-image {
+  width: 120px;
+  height: 90px;
+  object-fit: contain;
+  filter: drop-shadow(3px 3px 8px rgba(0,0,0,0.4));
+  transform: scale(1.2); /* 額外放大20% */
+  animation: fish-appear 0.5s ease-out;
+}
+
+@keyframes fish-appear {
+  0% {
+    transform: scale(0.5) rotate(-20deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.4) rotate(-10deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+  }
+}
+
 @keyframes fish-struggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-15deg) translateY(-5px); }
-  75% { transform: rotate(15deg) translateY(5px); }
+  0%, 100% { transform: scale(1.2) rotate(0deg); }
+  25% { transform: scale(1.2) rotate(-15deg) translateY(-5px); }
+  75% { transform: scale(1.2) rotate(15deg) translateY(5px); }
 }
 
 /* 水底游泳的魚 */
@@ -582,36 +646,59 @@ export default {
 .fish {
   position: absolute;
   font-size: 1.5rem;
-  animation: swimming 4s ease-in-out infinite;
+  animation: swimming-to-right 4s linear infinite;
+  opacity: 0; /* 初始隱藏，等動畫開始才顯示 */
+}
+
+.swimming-fish-image {
+  width: 65px;
+  height: 50px;
+  object-fit: contain;
+  filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
 }
 
 .fish:nth-child(1) {
-  top: 20px;
+  top: 10px;
   animation-duration: 3s;
 }
 
 .fish:nth-child(2) {
-  top: 60px;
+  top: 40px;
   animation-duration: 4s;
 }
 
 .fish:nth-child(3) {
-  top: 100px;
+  top: 70px;
   animation-duration: 5s;
 }
 
-@keyframes swimming {
+.fish:nth-child(4) {
+  top: 100px;
+  animation-duration: 3.5s;
+}
+
+.fish:nth-child(5) {
+  top: 25px;
+  animation-duration: 4.5s;
+}
+
+.fish:nth-child(6) {
+  top: 85px;
+  animation-duration: 6s;
+}
+
+@keyframes swimming-to-right {
   0% {
-    left: -50px;
+    opacity: 1;
     transform: scaleX(1);
   }
   50% {
-    left: 50%;
     transform: scaleX(1);
   }
   100% {
     left: calc(100% + 50px);
     transform: scaleX(-1);
+    opacity: 0;
   }
 }
 
@@ -912,8 +999,13 @@ export default {
   }
   
   .fisherman {
-    left: 20px;
-    top: 30px;
+    left: 10px;
+    top: 15px;
+  }
+  
+  .fishing-rod-container {
+    left: 70%;
+    top: 25px;
   }
   
   .person {
@@ -921,7 +1013,16 @@ export default {
   }
   
   .fishing-rod {
-    width: 100px;
+    width: 120px;
+  }
+  
+  .fisherman-img {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .rod-image {
+    width: 140px;
   }
   
   .game-hud {
