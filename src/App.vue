@@ -169,7 +169,7 @@ export default {
       betAmount: 10,
       isFishing: false,
       fishingTime: 0,
-      currentMultiplier: 1.0,
+      currentMultiplier: 0.0,
       escapeChance: 0,
       fishCaught: false,
       fishHooked: false,
@@ -196,7 +196,7 @@ export default {
       this.balance -= this.betAmount;
       this.isFishing = true;
       this.fishingTime = 0;
-      this.currentMultiplier = 1.0;
+      this.currentMultiplier = 0.0;
       this.escapeChance = 0;
       this.fishCaught = false;
       this.fishHooked = false;
@@ -223,7 +223,7 @@ export default {
         
         if (this.fishHooked) {
           this.fishStruggleTime += 0.1;
-          this.currentMultiplier = 1 + (this.fishStruggleTime * 0.3);
+          this.currentMultiplier = this.fishStruggleTime * 0.4;
           this.escapeChance = Math.min(this.fishStruggleTime * 8, 95);
           
           // 更新抖動強度
@@ -308,7 +308,7 @@ export default {
       this.isFishing = false;
       this.fishingTime = 0;
       this.fishStruggleTime = 0;
-      this.currentMultiplier = 1.0;
+      this.currentMultiplier = 0.0;
       this.escapeChance = 0;
       this.fishCaught = false;
       this.fishHooked = false;
